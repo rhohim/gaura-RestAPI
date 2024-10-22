@@ -68,7 +68,7 @@ export const deleteallCategoryController = async (req: Request, res: Response): 
     await CategoryService.deleteAllCategoryService()
     logger.info('All categories deleted successfully')
 
-    res.status(200).json({
+    res.status(200).send({
       message: 'All Categories Deleted Successfully'
     })
   } catch (error) {
@@ -82,7 +82,7 @@ export const deleteallCategoryController = async (req: Request, res: Response): 
 export const getCategoryByIdController = async (req: Request, res: Response): Promise<void> => {
   const categoryId = parseInt(req.params.id)
   if (isNaN(categoryId)) {
-    res.status(400).json({ message: 'Invalid Category ID' })
+    res.status(400).send({ message: 'Invalid Category ID' })
     return
   }
 
@@ -90,7 +90,7 @@ export const getCategoryByIdController = async (req: Request, res: Response): Pr
     const category = await CategoryService.getCategoryByIdService(categoryId)
     logger.info(`Fetched category with ID: ${categoryId}`)
 
-    res.status(200).json({
+    res.status(200).send({
       id: category.id,
       data: {
         category_name: category.category_name
@@ -100,10 +100,10 @@ export const getCategoryByIdController = async (req: Request, res: Response): Pr
   } catch (error) {
     if (error instanceof Error) {
       if (error.message === 'Category Not Found') {
-        res.status(404).json({ message: 'Category Not Found' })
+        res.status(404).send({ message: 'Category Not Found' })
       } else {
         logger.error(`Error fetching category: ${error.message}`)
-        res.status(500).json({
+        res.status(500).send({
           message: 'Error Fetching Category',
           error: error.message || error
         })
@@ -116,7 +116,7 @@ export const deletCategoryByIdController = async (req: Request, res: Response): 
   const categoryId = parseInt(req.params.id)
 
   if (isNaN(categoryId)) {
-    res.status(400).json({ message: 'Invalid Category ID' })
+    res.status(400).send({ message: 'Invalid Category ID' })
     return
   }
 
@@ -124,23 +124,23 @@ export const deletCategoryByIdController = async (req: Request, res: Response): 
     await CategoryService.deleteCategoryByIdService(categoryId)
     logger.info(`Deleted category with ID: ${categoryId}`)
 
-    res.status(200).json({
+    res.status(200).send({
       message: 'Deleted'
     })
   } catch (error) {
     if (error instanceof Error) {
       if (error.message === 'Category Not Found') {
-        res.status(404).json({ message: 'Category Not Found' })
+        res.status(404).send({ message: 'Category Not Found' })
       } else {
         logger.error(`Error deleting category: ${error.message}`)
-        res.status(500).json({
+        res.status(500).send({
           message: 'Error Deleting Category',
           error: error.message
         })
       }
     } else {
       logger.error(`Unexpected error: ${String(error)}`)
-      res.status(500).json({
+      res.status(500).send({
         message: 'Unexpected Error Deleting Category',
         error: String(error)
       })
@@ -153,7 +153,7 @@ export const putCategoryByIdControoler = async (req: Request, res: Response): Pr
   const categoryData = req.body
 
   if (isNaN(categoryId)) {
-    res.status(400).json({ message: 'Invalid Category ID' })
+    res.status(400).send({ message: 'Invalid Category ID' })
     return
   }
 
@@ -161,24 +161,24 @@ export const putCategoryByIdControoler = async (req: Request, res: Response): Pr
     const updatedCategory = await CategoryService.updateCategoryByIdService(categoryId, categoryData)
     logger.info(`Updated category with ID: ${categoryId}`)
 
-    res.status(200).json({
+    res.status(200).send({
       message: 'Update Successful',
       category: updatedCategory
     })
   } catch (error) {
     if (error instanceof Error) {
       if (error.message === 'Category Not Found') {
-        res.status(404).json({ message: 'Category Not Found' })
+        res.status(404).send({ message: 'Category Not Found' })
       } else {
         logger.error(`Error updating category: ${error.message}`)
-        res.status(500).json({
+        res.status(500).send({
           message: 'Error Updating Category',
           error: error.message
         })
       }
     } else {
       logger.error(`Unexpected error: ${String(error)}`)
-      res.status(500).json({
+      res.status(500).send({
         message: 'Unexpected Error Updating Category',
         error: String(error)
       })
