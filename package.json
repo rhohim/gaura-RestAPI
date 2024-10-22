@@ -1,0 +1,50 @@
+{
+  "name": "api_gaura",
+  "version": "1.0.0",
+  "description": "Rest API",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx tsc -w",
+    "dev": "npx nodemon",
+    "build": "tsc",
+    "format": "prettier --write .",
+    "husky": "husky install",
+    "check-types": "tsc --pretty --noEmit",
+    "check-format": "prettier --check .",
+    "lint": "eslint"
+  },
+  "husky": {
+    "pre-commit": "npx pretty-quick --staged ng lint ng test",
+    "pre-push": "ng build --aot true"
+  },
+  "author": "dull's",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "eslint": "^9.13.0",
+    "globals": "^15.11.0",
+    "husky": "^9.1.6",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.11.3",
+    "prettier": "3.3.3",
+    "pretty-quick": "^4.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.10.0"
+  },
+  "dependencies": {
+    "@types/multer": "^1.4.12",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "imagekit": "^5.2.0",
+    "joi": "^17.13.3",
+    "moment": "^2.30.1",
+    "nodemon": "^3.1.7",
+    "pino": "^9.5.0",
+    "pino-pretty": "^11.3.0"
+  }
+}

@@ -1,0 +1,25 @@
+#!/bin/sh
+
+. "$(dirname "$0")/_/husky.sh"
+
+echo 'Styling, Testing and Building Project'
+
+npm run check-format ||
+(
+    echo 'Prettier Check Failed. Run npm run format'
+    false;
+)
+
+npm run check-types ||
+(
+    echo 'Failed type check. Make the changes require above'
+    false;
+)
+
+npm run build ||
+(
+    echo 'Build Failed. vie the errors above'
+    false;
+)
+
+echo 'Success Commited'
