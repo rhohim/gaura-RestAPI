@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { uploadFile } from '../utils/fileHandling'
 import { logger } from '../utils/logger'
 import ClientType from '../type/client.type'
+import { ClientValidation } from '../validations/client.validation'
 
 export const getallClientController = async (req: Request, res: Response): Promise<void> => {
   const page = parseInt(req.query.page as string) || 1
@@ -20,20 +21,38 @@ export const getallClientController = async (req: Request, res: Response): Promi
     }
 
     const paginationResult = client.slice(start, end)
-    const formattedData = paginationResult.map((data) => ({
-      id: data.id,
-      data: {
-        client_name: data.client_name,
-        client_image: data.client_image
+    // const formattedData = paginationResult.map((data) => ({
+    //   id: data.id,
+    //   data: {
+    //     client_name: data.client_name,
+    //     client_image: data.client_image
+    //   }
+    // }))
+    const validationData = paginationResult.map((data) => {
+      const { error } = ClientValidation(data)
+
+      if (error) {
+        logger.error(`Validation error: ${error.message}`)
+        res.status(400).send({
+          message: 'Validation Failed',
+          error: error.message
+        })
       }
-    }))
+      return {
+        id: data.id,
+        data: {
+          client_name: data.client_name,
+          client_image: data.client_image
+        }
+      }
+    })
     logger.info('Status 200: Get All Client Data')
     res.status(200).send({
       page,
       pageSize,
       totalData: client.length,
       totalPages: Math.ceil(client.length / pageSize),
-      client: formattedData,
+      client: validationData,
       message: 'Success'
     })
   } catch (error) {
@@ -59,6 +78,16 @@ export const postClientController = async (req: Request, res: Response): Promise
     }
   }
   const { client_name } = req.body
+  const payload = { id: 0, client_name, client_image: client_image_URL }
+  const { error } = ClientValidation(payload)
+  if (error) {
+    logger.error(`Validation error: ${error.message}`)
+    res.status(400).send({
+      message: 'Validation Failed',
+      error: error.message
+    })
+    return
+  }
   try {
     const newClient = await ClientService.postClientService(client_name, client_image_URL)
     logger.info('Status 200 : Insert client data')
@@ -102,6 +131,16 @@ export const getClientByIdController = async (req: Request, res: Response): Prom
   try {
     const client = await ClientService.getClientByIdService(clientId)
     logger.info('Status 200: Successfully Fetching Client data')
+    const { error } = ClientValidation(client)
+
+    if (error) {
+      logger.error(`Validation error for category ID ${clientId}: ${error.message}`)
+      res.status(400).send({
+        message: 'Validation Failed',
+        error: error.message
+      })
+      return
+    }
     res.status(200).send({
       id: client.id,
       data: {
@@ -167,6 +206,23 @@ export const updateClientController = async (req: Request, res: Response): Promi
   const clientData = {
     client_name,
     client_image: client_image_URL || undefined
+  }
+
+  const payload = {
+    id: clientId,
+    client_name,
+    client_image: client_image_URL !== null ? client_image_URL : ''
+  }
+
+  const { error } = ClientValidation(payload)
+
+  if (error) {
+    logger.error(`Validation error for client update: ${error.message}`)
+    res.status(400).send({
+      message: 'Validation Failed',
+      error: error.message
+    })
+    return
   }
 
   try {

@@ -2,6 +2,7 @@ import { Response, Request } from 'express'
 import * as CategoryService from '../services/category.service'
 import CategoryType from '../type/category.type'
 import { logger } from '../utils/logger'
+import { CategoryValidation } from '../validations/category.validation'
 
 export const getallCategoryController = async (req: Request, res: Response): Promise<void> => {
   const page = parseInt(req.query.page as string) || 1
@@ -20,19 +21,37 @@ export const getallCategoryController = async (req: Request, res: Response): Pro
     }
 
     const paginationResult = category.slice(start, end)
-    const formattedData = paginationResult.map((data) => ({
-      id: data.id,
-      data: {
-        category_name: data.category_name
+    // const formattedData = paginationResult.map((data) => ({
+    //   id: data.id,
+    //   data: {
+    //     category_name: data.category_name
+    //   }
+    // }))
+    const validatedData = paginationResult.map((data) => {
+      const { error } = CategoryValidation(data)
+      if (error) {
+        logger.error(`Validation error: ${error.message}`)
+        res.status(400).send({
+          message: 'Validation Failed',
+          error: error.message
+        })
       }
-    }))
+
+      // Return the formatted and validated data
+      return {
+        id: data.id,
+        data: {
+          category_name: data.category_name
+        }
+      }
+    })
     logger.info(`Status 200: Get All Category success`)
     res.status(200).send({
       page,
       pageSize,
       totalData: category.length,
       totalPages: Math.ceil(category.length / pageSize),
-      category: formattedData,
+      category: validatedData,
       message: 'Success'
     })
   } catch (error) {
@@ -46,6 +65,16 @@ export const getallCategoryController = async (req: Request, res: Response): Pro
 
 export const postCategoryController = async (req: Request, res: Response): Promise<void> => {
   const { category_name } = req.body
+  const payload = { id: 0, category_name }
+  const { error } = CategoryValidation(payload)
+  if (error) {
+    logger.error(`Validation error: ${error.message}`)
+    res.status(400).send({
+      message: 'Validation Failed',
+      error: error.message
+    })
+    return
+  }
 
   try {
     const newCategory = await CategoryService.postCategoryService(category_name)
@@ -89,6 +118,17 @@ export const getCategoryByIdController = async (req: Request, res: Response): Pr
   try {
     const category = await CategoryService.getCategoryByIdService(categoryId)
     logger.info(`Fetched category with ID: ${categoryId}`)
+
+    const { error } = CategoryValidation(category)
+
+    if (error) {
+      logger.error(`Validation error for category ID ${categoryId}: ${error.message}`)
+      res.status(400).send({
+        message: 'Validation Failed',
+        error: error.message
+      })
+      return
+    }
 
     res.status(200).send({
       id: category.id,
@@ -151,9 +191,21 @@ export const deletCategoryByIdController = async (req: Request, res: Response): 
 export const putCategoryByIdControoler = async (req: Request, res: Response): Promise<void> => {
   const categoryId = parseInt(req.params.id)
   const categoryData = req.body
+  categoryData['id'] = categoryId
 
   if (isNaN(categoryId)) {
     res.status(400).send({ message: 'Invalid Category ID' })
+    return
+  }
+
+  const { error } = CategoryValidation(categoryData)
+
+  if (error) {
+    logger.error(`Validation error for category update: ${error.message}`)
+    res.status(400).send({
+      message: 'Validation Failed',
+      error: error.message
+    })
     return
   }
 
