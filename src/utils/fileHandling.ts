@@ -1,8 +1,9 @@
 import ImageKit from 'imagekit'
+import { configFile } from '../config/environment'
 const ik = new ImageKit({
-  publicKey: 'public_Osi6s+nNxW1wl62XArIK2HR6zAU=',
-  privateKey: 'private_BRlQFtaDusMUSfoBRxmhunXJ9G0=',
-  urlEndpoint: 'https://ik.imagekit.io/gauradev'
+  publicKey: configFile.public_key,
+  privateKey: configFile.private_key,
+  urlEndpoint: configFile.url_endpoint
 })
 
 interface File {

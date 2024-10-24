@@ -1,5 +1,6 @@
 import mysql, { Connection } from 'mysql2'
 import { configDB } from '../config/environment'
+import { config } from 'dotenv'
 
 function creatConnection(): Connection {
   const db: Connection = mysql.createConnection({

@@ -37,7 +37,6 @@ export const getallCategoryController = async (req: Request, res: Response): Pro
         })
       }
 
-      // Return the formatted and validated data
       return {
         id: data.id,
         data: {
