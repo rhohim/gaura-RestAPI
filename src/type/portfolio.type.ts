@@ -13,6 +13,23 @@ export default interface PortfolioType {
   copy_5: string
   copy_6: string
   image_1: string
-  category_id: number
+  image_2: string
+  image_3: string
+  image_4: string
+  image_5: string
+  image_6: string
+  image_7: string
+  image_8: string
+  image_9: string
+  image_10: string
+  image_11: string
+  image_12: string
+  category_1_id: number
+  category_2_id: number
+  category_3_id: number
   client_id: number
+  category_name_1?: string
+  category_name_2?: string
+  category_name_3?: string
+  client_name?: string
 }
